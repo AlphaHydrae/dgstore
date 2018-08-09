@@ -1,0 +1,3 @@
+# dgstore
+
+**Hash files.**
