@@ -1,3 +1,3 @@
 # dgstore
 
-**Hash files.**
+**Hash files and store the digests next to the files for future comparison.**
