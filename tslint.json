@@ -69,7 +69,6 @@
     "no-unnecessary-type-annotation": true,
     "no-unnecessary-type-assertion": true,
     "no-unbound-method": true,
-    "no-unused-variable": true,
     "no-var-before-return": true,
     "number-literal-format": true,
     "object-curly-spacing": [ true, "always" ],
