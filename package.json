@@ -40,6 +40,13 @@
     "README.md",
     "lib"
   ],
+  "dependencies": {
+    "chalk": "^2.4.1",
+    "fast-glob": "^2.2.2",
+    "fs-extra": "^7.0.0",
+    "lodash": "^4.17.10",
+    "yargs": "^12.0.1"
+  },
   "devDependencies": {
     "@types/chalk": "^2.2.0",
     "@types/fs-extra": "^5.0.4",
@@ -62,12 +69,5 @@
   },
   "engines": {
     "node": ">= 8.0.0 < 11.0.0"
-  },
-  "dependencies": {
-    "chalk": "^2.4.1",
-    "fast-glob": "^2.2.2",
-    "fs-extra": "^7.0.0",
-    "lodash": "^4.17.10",
-    "yargs": "^12.0.1"
   }
 }
