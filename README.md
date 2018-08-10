@@ -31,6 +31,12 @@ dgstore "some-directory/**/*"
 
 # Include dot files.
 dgstore "some-directory/*" "some-directory/.*"
+
+# Compute and check only, do not create any digest files.
+dgstore -w false "some-file.txt"
+
+# Show full SHA-512 digests instead of short prefixes.
+dgstore --full-digest "some-file.txt"
 ```
 
 
