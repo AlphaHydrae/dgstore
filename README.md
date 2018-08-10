@@ -5,6 +5,8 @@
 [![npm version](https://badge.fury.io/js/%40alphahydrae%2Fdgstore.svg)](https://badge.fury.io/js/%40alphahydrae%2Fdgstore)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.txt)
 
+![demo](dgstore.gif)
+
 
 
 ## Usage
