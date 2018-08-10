@@ -34,7 +34,7 @@
     "no-duplicate-imports": true,
     "no-duplicate-switch-case": true,
     "no-duplicate-variable": true,
-    "no-dynamic-delete": true,
+    "no-dynamic-delete": false,
     "no-empty-character-class": true,
     "no-ex-assign": true,
     "no-extra-boolean-cast": true,
