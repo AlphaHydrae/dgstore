@@ -2,7 +2,7 @@
 
 **Hash files and store the digests next to the files for future comparison.**
 
-[![npm version](https://badge.fury.io/js/dgstore.svg)](https://badge.fury.io/js/dgstore)
+[![npm version](https://badge.fury.io/js/%40alphahydrae%2Fdgstore.svg)](https://badge.fury.io/js/%40alphahydrae%2Fdgstore)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.txt)
 
 
