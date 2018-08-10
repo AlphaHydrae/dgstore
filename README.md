@@ -18,7 +18,7 @@ file already exists, it will read it, re-hash the file, and compare both hashes
 to tell you whether it has changed or not since the digest file was saved.
 
 ```bash
-npm install -g dgstore
+npm install -g @alphahydrae/dgstore
 
 # Compute and store/check a single file's digest.
 dgstore "some-file.txt"
