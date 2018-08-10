@@ -1,5 +1,5 @@
 {
-  "name": "dgstore",
+  "name": "@alphahydrae/dgstore",
   "version": "1.0.0",
   "description": "Hash files and store the digests next to the files for future comparison.",
   "main": "lib/index.js",
