@@ -39,7 +39,7 @@ export async function dgstore(options: DgstoreOptions) {
 
   const stats = filesAndDigests.filter((current: GlobStats) => !current.path.match(/\.sha512$/) || !filesAndDigests.find(other => other.path === current.path.replace(/\.sha512$/, '')));
 
-  listSpinner.succeed(`${stats.length} matching files found`);
+  listSpinner.succeed(`${stats.length} matching file${stats.length !== 1 ? 's' : ''} found`);
 
   // TODO: parallelize
   for (const stat of stats) {
