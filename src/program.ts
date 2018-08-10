@@ -1,7 +1,8 @@
 import { pick } from 'lodash';
+import { resolve as resolvePath } from 'path';
 import * as yargs from 'yargs';
 
-export function program(argv = process.argv) {
+export function program(argv = process.argv.slice(1)) {
 
   const args = yargs
 
@@ -18,9 +19,13 @@ export function program(argv = process.argv) {
       type: 'boolean'
     })
 
-    .argv;
+    .parse(argv);
 
   const targets = args._;
+  if (resolvePath(targets[0]) === resolvePath(args.$0)) {
+    targets.shift();
+  }
+
   if (!targets.length) {
     throw new Error('A file, directory or glob pattern must be given as the first argument');
   }

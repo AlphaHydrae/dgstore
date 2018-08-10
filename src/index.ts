@@ -7,7 +7,7 @@ import * as ora from 'ora';
 
 import { program } from './program';
 
-export function cli(argv = process.argv) {
+export function cli(argv = process.argv.slice(1)) {
   return Promise
     .resolve(argv)
     .then(program)
