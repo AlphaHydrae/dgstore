@@ -1,2 +1,4 @@
 # https://git-scm.com/docs/gitignore
+/coverage
 /target
+/tmp
