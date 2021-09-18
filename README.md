@@ -2,6 +2,7 @@
 
 **Hash files and store the digests next to the files for future comparison.**
 
+[![build](https://github.com/AlphaHydrae/dgstore/actions/workflows/build.yml/badge.svg)](https://github.com/AlphaHydrae/dgstore/actions/workflows/build.yml)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.txt)
 
 ![demo](dgstore.gif)
