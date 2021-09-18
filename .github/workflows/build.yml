@@ -1,0 +1,73 @@
+name: build
+
+on:
+  push:
+    branches:
+      - "**"
+    tags:
+      - "**"
+  schedule:
+    # Minute (0-59), Hour (0-23), Day of the month (1-31), Month of the Year (1-12), Day of the week (0-6, 0 = Sunday)
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+jobs:
+  check:
+    name: Check the package and its dependencies for errors
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          override: true
+          profile: minimal
+          toolchain: 1.55.0
+      - uses: actions-rs/cargo@v1
+        with:
+          command: check
+
+  test:
+    name: Run automated tests
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          override: true
+          profile: minimal
+          toolchain: 1.55.0
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
+
+  fmt:
+    name: Check code formatting
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          components: rustfmt
+          override: true
+          profile: minimal
+          toolchain: 1.55.0
+      - uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
+
+  clippy:
+    name: Lint code
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          components: clippy
+          override: true
+          profile: minimal
+          toolchain: 1.55.0
+      - uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: -- -D warnings

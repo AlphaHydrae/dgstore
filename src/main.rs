@@ -38,7 +38,7 @@ impl fmt::Display for DgStoreError {
 
 fn main() {
     let patterns: Vec<String> = env::args().skip(1).collect();
-    if patterns.len() == 0 {
+    if patterns.is_empty() {
         println!("{}", Red.paint("At least one file argument is required"));
         process::exit(1);
     }
@@ -54,8 +54,12 @@ fn main() {
     }
 }
 
-fn compute_and_store_digests(patterns: &Vec<String>) -> Result<(), DgStoreError> {
+fn compute_and_store_digests(patterns: &[String]) -> Result<(), DgStoreError> {
     for file in glob_files(patterns)? {
+        if fs::metadata(&file).map_or(false, |meta| meta.is_dir()) {
+            continue;
+        }
+
         match hash_file(&file) {
             Ok(_) => {}
             Err(error) => {
@@ -71,7 +75,7 @@ fn compute_and_store_digests(patterns: &Vec<String>) -> Result<(), DgStoreError>
     Ok(())
 }
 
-fn glob_files(patterns: &Vec<String>) -> Result<Vec<String>, DgStoreError> {
+fn glob_files(patterns: &[String]) -> Result<Vec<String>, DgStoreError> {
     let mut files: Vec<String> = Vec::new();
     for pattern in patterns {
         let results =
@@ -97,11 +101,21 @@ fn glob_files(patterns: &Vec<String>) -> Result<Vec<String>, DgStoreError> {
     Ok(files)
 }
 
-fn hash_file(path: &String) -> Result<(), DgStoreError> {
+fn hash_file(path: &str) -> Result<(), DgStoreError> {
     let mut file = File::open(path).map_err(DgStoreError::Digest)?;
 
     let digest_file_path = format!("{}.sha512", path);
-    let digest_file_contents = fs::read_to_string(&digest_file_path).map_err(DgStoreError::Digest)?;
+
+    let digest_file_contents = fs::read_to_string(&digest_file_path);
+    let digest_file_contents = match digest_file_contents {
+        Ok(contents) => contents,
+        Err(error) => match error.kind() {
+            io::ErrorKind::NotFound => "".to_string(),
+            _ => {
+                return Err(DgStoreError::Digest(error));
+            }
+        },
+    };
 
     let mut hasher = Sha512::new();
 
