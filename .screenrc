@@ -1,0 +1,7 @@
+source $HOME/.screenrc
+
+screen -t test 0
+stuff "cargo check\012cargo test"
+screen -t shell 2
+
+select shell

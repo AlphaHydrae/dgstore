@@ -1,0 +1,16 @@
+#https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[package]
+name = "dgstore"
+version = "0.1.0"
+authors = ["Simon Oulevay <rust@alphahydrae.com>"]
+edition = "2018"
+description = "Hash files and store the digests next to the files for future comparison."
+homepage = "https://github.com/AlphaHydrae/dgstore#readme"
+repository = "https://github.com/AlphaHydrae/dgstore"
+license = "MIT"
+keywords = ["digest", "hash"]
+categories = ["command-line-utilities", "filesystem"]
+exclude = ["dgstore.gif"]
+
+[dependencies]

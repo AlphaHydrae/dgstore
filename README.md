@@ -2,7 +2,6 @@
 
 **Hash files and store the digests next to the files for future comparison.**
 
-[![npm version](https://badge.fury.io/js/%40alphahydrae%2Fdgstore.svg)](https://badge.fury.io/js/%40alphahydrae%2Fdgstore)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.txt)
 
 ![demo](dgstore.gif)
@@ -40,13 +39,3 @@ dgstore -w false "some-file.txt"
 # Show full SHA-512 digests instead of short prefixes.
 dgstore --full-digest "some-file.txt"
 ```
-
-
-
-## Requirements
-
-* [Node.js][node] 8+
-
-
-
-[node]: https://nodejs.org/
