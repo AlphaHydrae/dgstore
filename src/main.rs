@@ -9,18 +9,18 @@ use glob::GlobError;
 use glob::PatternError;
 use sha2::{Digest, Sha512};
 use std::env;
-use std::ffi::OsString;
 use std::fmt;
 use std::fs;
 use std::fs::File;
 use std::io;
+use std::path::Path;
+use std::path::PathBuf;
 use std::process;
 
 enum DgStoreError {
     Digest(io::Error),
     Glob(GlobError),
     GlobPattern(String, PatternError),
-    InvalidFilePath(OsString),
 }
 
 impl fmt::Display for DgStoreError {
@@ -28,9 +28,6 @@ impl fmt::Display for DgStoreError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             DgStoreError::Digest(error) => write!(f, "Digest error: {}", error),
-            DgStoreError::InvalidFilePath(path) => {
-                write!(f, "Invalid file path matched: {}", path.to_string_lossy())
-            }
             DgStoreError::Glob(error) => write!(f, "Path glob error: {}", error),
             DgStoreError::GlobPattern(pattern, error) => {
                 write!(f, "Pattern {} is invalid: {}", pattern, error)
@@ -68,7 +65,10 @@ fn compute_and_store_digests(patterns: &[String]) -> Result<(), DgStoreError> {
             Err(error) => {
                 println!(
                     "{}",
-                    paint(Red, format!("Could not hash file {}: {}", file, error))
+                    paint(
+                        Red,
+                        format!("Could not hash file {}: {}", file.display(), error)
+                    )
                 );
                 process::exit(1);
             }
@@ -78,22 +78,16 @@ fn compute_and_store_digests(patterns: &[String]) -> Result<(), DgStoreError> {
     Ok(())
 }
 
-fn glob_files(patterns: &[String]) -> Result<Vec<String>, DgStoreError> {
-    let mut files: Vec<String> = Vec::new();
+fn glob_files(patterns: &[String]) -> Result<Vec<PathBuf>, DgStoreError> {
+    let mut files: Vec<PathBuf> = Vec::new();
     for pattern in patterns {
         let results =
             glob(pattern).map_err(|err| DgStoreError::GlobPattern(pattern.clone(), err))?;
         for result in results {
             match result {
-                Ok(file) => match file.to_str() {
-                    Some(path) => {
-                        files.push(path.to_string());
-                    }
-                    None => {
-                        let os_str = file.as_path().as_os_str().to_os_string();
-                        return Err(DgStoreError::InvalidFilePath(os_str));
-                    }
-                },
+                Ok(file) => {
+                    files.push(file.as_path().to_path_buf());
+                }
                 Err(err) => {
                     return Err(DgStoreError::Glob(err));
                 }
@@ -104,10 +98,11 @@ fn glob_files(patterns: &[String]) -> Result<Vec<String>, DgStoreError> {
     Ok(files)
 }
 
-fn hash_file(path: &str) -> Result<(), DgStoreError> {
+fn hash_file(path: &Path) -> Result<(), DgStoreError> {
     let mut file = File::open(path).map_err(DgStoreError::Digest)?;
 
-    let digest_file_path = format!("{}.sha512", path);
+    let digest_file_path_buf = add_extension(path, ".sha512");
+    let digest_file_path = digest_file_path_buf.as_path();
     let digest_file_contents = read_digest_file(&digest_file_path)?;
 
     let mut hasher = Sha512::new();
@@ -122,41 +117,44 @@ fn hash_file(path: &str) -> Result<(), DgStoreError> {
     }) {
         Some((expected_digest, true)) => show_file_unchanged(path, &expected_digest),
         Some((expected_digest, false)) => show_file_changed(path, &actual_digest, &expected_digest),
-        None => save_digest(path, &digest_file_path, &actual_digest),
+        None => save_digest(path, digest_file_path, &actual_digest),
     }
 }
 
-fn save_digest(path: &str, digest_path: &str, digest: &str) -> Result<(), DgStoreError> {
+fn save_digest(path: &Path, digest_path: &Path, digest: &str) -> Result<(), DgStoreError> {
     fs::write(&digest_path, &digest).map_err(DgStoreError::Digest)?;
 
     println!(
         "{} {} {} {}",
         paint(Green, "✓"),
         paint(Cyan, format!("{:.7}", digest)),
-        path,
-        paint(Yellow, format!("(stored digest to {})", digest_path))
+        path.display(),
+        paint(
+            Yellow,
+            format!("(stored digest to {})", digest_path.display())
+        )
     );
 
     Ok(())
 }
 
-fn show_file_unchanged(path: &str, digest: &str) -> Result<(), DgStoreError> {
+fn show_file_unchanged(path: &Path, digest: &str) -> Result<(), DgStoreError> {
     println!(
         "{} {} {}",
         paint(Green, "✓"),
         paint(Green, format!("{:.7}", digest)),
-        path
+        path.display()
     );
 
     Ok(())
 }
 
-fn show_file_changed(path: &str, digest: &str, original_digest: &str) -> Result<(), DgStoreError> {
+fn show_file_changed(path: &Path, digest: &str, original_digest: &str) -> Result<(), DgStoreError> {
     println!(
         "{} {} {} {}",
         paint(Red, "✗"),
         paint(Red, format!("{:.7}", digest)),
-        path,
+        path.display(),
         paint(
             Yellow,
             format!(
@@ -170,7 +168,7 @@ fn show_file_changed(path: &str, digest: &str, original_digest: &str) -> Result<
     Ok(())
 }
 
-fn read_digest_file(path: &str) -> Result<Option<String>, DgStoreError> {
+fn read_digest_file(path: &Path) -> Result<Option<String>, DgStoreError> {
     fs::read_to_string(path)
         .map(Some)
         .or_else(|err| match err.kind() {
@@ -187,4 +185,10 @@ where
         Ok(_) => contents.into(),
         Err(_) => Style::from(color).paint(contents.into()).to_string(),
     }
+}
+
+fn add_extension(path: &Path, extension: &str) -> PathBuf {
+    let mut path_string = path.as_os_str().to_os_string();
+    path_string.push(extension);
+    Path::new(&path_string).to_path_buf()
 }
