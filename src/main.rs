@@ -79,11 +79,11 @@ fn compute_and_store_digests(patterns: &[String]) -> Result<(), DgStoreError> {
 }
 
 fn glob_files(patterns: &[String]) -> Result<Vec<PathBuf>, DgStoreError> {
+    let valid_patterns = execute_glob_patterns(patterns)?;
+
     let mut files: Vec<PathBuf> = Vec::new();
-    for pattern in patterns {
-        let results =
-            glob(pattern).map_err(|err| DgStoreError::GlobPattern(pattern.clone(), err))?;
-        for result in results {
+    for pattern in valid_patterns {
+        for result in pattern {
             match result {
                 Ok(file) => {
                     files.push(file.as_path().to_path_buf());
@@ -96,6 +96,18 @@ fn glob_files(patterns: &[String]) -> Result<Vec<PathBuf>, DgStoreError> {
     }
 
     Ok(files)
+}
+
+fn execute_glob_patterns(patterns: &[String]) -> Result<Vec<glob::Paths>, DgStoreError> {
+    let mut results: Vec<glob::Paths> = Vec::new();
+    for pattern in patterns {
+        match glob(pattern) {
+            Ok(paths) => results.push(paths),
+            Err(err) => return Err(DgStoreError::GlobPattern(pattern.to_string(), err)),
+        }
+    }
+
+    Ok(results)
 }
 
 fn hash_file(path: &Path) -> Result<(), DgStoreError> {
