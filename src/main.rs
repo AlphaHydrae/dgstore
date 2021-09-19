@@ -103,7 +103,7 @@ fn hash_file(path: &Path) -> Result<(), DgStoreError> {
 
     let digest_file_path_buf = add_extension(path, ".sha512");
     let digest_file_path = digest_file_path_buf.as_path();
-    let digest_file_contents = read_digest_file(&digest_file_path)?;
+    let digest_file_contents = read_digest_file(digest_file_path)?;
 
     let mut hasher = Sha512::new();
 
