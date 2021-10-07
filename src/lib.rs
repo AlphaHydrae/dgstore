@@ -19,15 +19,16 @@ use std::process;
 
 pub struct Config {
     patterns: Vec<String>,
+    write: bool,
 }
 
 impl Config {
-    pub fn new(patterns: Vec<String>) -> Result<Config, DgStoreError> {
+    pub fn new(patterns: Vec<String>, write: bool) -> Result<Config, DgStoreError> {
         if patterns.is_empty() {
             return Err(DgStoreError::NoPatternsSpecified);
         }
 
-        Ok(Config { patterns })
+        Ok(Config { patterns, write })
     }
 }
 
@@ -60,7 +61,7 @@ pub fn compute_and_store_digests(config: Config) -> Result<(), DgStoreError> {
             continue;
         }
 
-        match hash_file(&file) {
+        match hash_file(&file, config.write) {
             Ok(_) => {}
             Err(error) => {
                 println!(
@@ -110,7 +111,7 @@ fn execute_glob_patterns(patterns: Vec<String>) -> Result<Vec<glob::Paths>, DgSt
     Ok(results)
 }
 
-fn hash_file(path: &Path) -> Result<(), DgStoreError> {
+fn hash_file(path: &Path, write: bool) -> Result<(), DgStoreError> {
     let mut file = File::open(path).map_err(DgStoreError::Digest)?;
 
     let digest_file_path_buf = add_extension(path, ".sha512");
@@ -129,7 +130,13 @@ fn hash_file(path: &Path) -> Result<(), DgStoreError> {
     }) {
         Some((expected_digest, true)) => show_file_unchanged(path, &expected_digest),
         Some((expected_digest, false)) => show_file_changed(path, &actual_digest, &expected_digest),
-        None => save_digest(path, digest_file_path, &actual_digest),
+        None => {
+            if write {
+                save_digest(path, digest_file_path, &actual_digest)
+            } else {
+                show_digest(path, &actual_digest)
+            }
+        }
     }
 }
 
@@ -145,6 +152,18 @@ fn save_digest(path: &Path, digest_path: &Path, digest: &str) -> Result<(), DgSt
             Yellow,
             format!("(stored digest to {})", digest_path.display())
         )
+    );
+
+    Ok(())
+}
+
+fn show_digest(path: &Path, digest: &str) -> Result<(), DgStoreError> {
+    println!(
+        "{} {} {} {}",
+        paint(Green, "✓"),
+        paint(Cyan, format!("{:.7}", digest)),
+        path.display(),
+        "(not saving digest)"
     );
 
     Ok(())
