@@ -159,11 +159,10 @@ fn save_digest(path: &Path, digest_path: &Path, digest: &str) -> Result<(), DgSt
 
 fn show_digest(path: &Path, digest: &str) -> Result<(), DgStoreError> {
     println!(
-        "{} {} {} {}",
+        "{} {} {} (not saving digest)",
         paint(Green, "✓"),
         paint(Cyan, format!("{:.7}", digest)),
-        path.display(),
-        "(not saving digest)"
+        path.display()
     );
 
     Ok(())
