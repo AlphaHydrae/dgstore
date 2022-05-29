@@ -188,8 +188,8 @@ fn show_file_changed(path: &Path, digest: &str, original_digest: &str) -> Result
         paint(
             Yellow,
             format!(
-                "(previous digest was {})",
-                format!("{:.7}", original_digest)
+                "(previous digest was {:.7})",
+                original_digest
             )
             .as_str()
         )
