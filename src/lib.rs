@@ -187,11 +187,7 @@ fn show_file_changed(path: &Path, digest: &str, original_digest: &str) -> Result
         path.display(),
         paint(
             Yellow,
-            format!(
-                "(previous digest was {:.7})",
-                original_digest
-            )
-            .as_str()
+            format!("(previous digest was {:.7})", original_digest).as_str()
         )
     );
 
